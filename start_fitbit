@@ -1,0 +1,68 @@
+import fitbit
+import gather_keys_oauth2 as Oauth2
+import pandas as pd 
+import datetime
+
+CLIENT_ID = 'yourID'
+CLIENT_SECRET = 'yourSECRET'
+
+#인스톨 해야 하는 라이브러리
+#!pip install fitbit
+#!pip install cherrypy
+
+server = Oauth2.OAuth2Server(CLIENT_ID, CLIENT_SECRET)
+server.browser_authorize()
+
+yesterday = str((datetime.datetime.now() - datetime.timedelta(days=1)).strftime("%Y-%m-%d"))
+ACCESS_TOKEN = str(server.fitbit.client.session.token['access_token'])
+REFRESH_TOKEN = str(server.fitbit.client.session.token['refresh_token'])
+auth2_client = fitbit.Fitbit(CLIENT_ID, CLIENT_SECRET, oauth2=True, access_token=ACCESS_TOKEN, refresh_token=REFRESH_TOKEN)
+
+yesterday = str((datetime.datetime.now() - datetime.timedelta(days=1)).strftime("%Y-%m-%d"))
+
+def mk_df(json,json_column):
+    time_list = []
+    val_list = []
+    for i in json[json_column]['dataset']:
+        val_list.append(i['value'])
+        time_list.append(i['time'])
+    df = pd.DataFrame({json_column:val_list,'Time':time_list})
+    return df
+    
+#심박수 체크
+fit_statsHR = auth2_client.intraday_time_series('activities/heart', base_date=yesterday, detail_level='1sec')
+
+#걸음 수 체크
+fit_statsST = auth2_client.intraday_time_series('activities/steps', base_date=yesterday, detail_level='1min')
+
+heartdf = mk_df(fit_statsHR,'activities-heart-intraday')
+stepsdf = mk_df(fit_statsST,'activities-steps-intraday')
+
+#수면 불러오기
+
+fit_statsSl = auth2_client.sleep(date='today')
+stime_list = []
+sval_list = []
+for i in fit_statsSl['sleep'][0]['minuteData']:
+    stime_list.append(i['dateTime'])
+    sval_list.append(i['value'])
+sleepdf = pd.DataFrame({'State':sval_list,
+                     'Time':stime_list})
+sleepdf['Interpreted'] = sleepdf['State'].map({'2':'Awake','3':'Very Awake','1':'Asleep'})
+sleepdf.to_csv('./result/sleep' + \
+               today+'.csv', \
+               columns = ['Time','State','Interpreted'],header=True, 
+               index = False)
+               
+fit_statsSum = auth2_client.sleep(date='today')['sleep'][0]
+ssummarydf = pd.DataFrame({'Date':fit_statsSum['dateOfSleep'],
+                'MainSleep':fit_statsSum['isMainSleep'],
+               'Efficiency':fit_statsSum['efficiency'],
+               'Duration':fit_statsSum['duration'],
+               'Minutes Asleep':fit_statsSum['minutesAsleep'],
+               'Minutes Awake':fit_statsSum['minutesAwake'],
+               'Awakenings':fit_statsSum['awakeCount'],
+               'Restless Count':fit_statsSum['restlessCount'],
+               'Restless Duration':fit_statsSum['restlessDuration'],
+               'Time in Bed':fit_statsSum['timeInBed']
+                        } ,index=[0])
