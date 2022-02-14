@@ -1,2 +1,3 @@
-# fitbit-api
-fitbit 데이터 살펴보기
+# SIGNAL-PROCESSING
+
+신호처리 관련 코드
