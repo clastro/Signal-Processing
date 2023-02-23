@@ -1,3 +1,6 @@
+from scipy import stats
+import numpy as np
+
 def make_zscore(ecg):
     return np.abs(stats.zscore(ecg))
   
