@@ -335,5 +335,42 @@ def shift_col(df,col):
         if(score_rank > original_time_rank[col]):
             df.loc[col] = df.loc[col].shift()
         
+
+"""
+def shift_col(df, col):
+    n = 5  # 4번째 Peak까지 보면서 정렬
+    
+    # Original rank mapping
+    original_time_rank = {
+        'P_Onsets': 1, 'P_Peaks': 2, 'P_Offsets': 3, 'R_Onsets': 4,
+        'Q_Peaks': 5, 'R_Peaks': 6, 'S_Peaks': 7, 'R_Offsets': 8,
+        'T_Onsets': 9, 'T_Peaks': 10, 'T_Offsets': 11
+    }
+
+    # Validate if col exists in df
+    if col not in df.columns:
+        raise ValueError(f"Column {col} does not exist in the DataFrame.")
+    
+    for i in range(n):
+        fill_value = 0 if np.isnan(df.loc[col][i]) else 5001
         
+        # Calculate rank
+        score_rank = np.round(df.fillna(fill_value)[i].rank(method='min')[col])
         
+        # Adjust score_rank based on conditions
+        if (col == 'P_Offsets' and score_rank == 4):
+            score_rank = 3
+        elif (col == 'R_Onsets' and score_rank in [3, 5]):
+            score_rank = 4
+        elif (col == 'Q_Peaks' and score_rank == 4):
+            score_rank = 5
+        elif (col == 'R_Offsets' and score_rank == 7):
+            score_rank = 8
+        elif (col == 'S_Peaks' and score_rank == 8):
+            score_rank = 7
+        
+        # Shift if necessary
+        if score_rank > original_time_rank[col]:
+            df.loc[col] = df.loc[col].shift()
+
+"""
