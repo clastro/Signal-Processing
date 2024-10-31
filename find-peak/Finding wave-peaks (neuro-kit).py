@@ -8,7 +8,7 @@ from tqdm import tqdm
 from scipy import signal
 from scipy.signal import butter, iirnotch, lfilter
 
-df_train = pd.read_csv('/smc_work/code/SMC_shea/csv_files/df_train.csv',encoding='utf-8-sig')
+df_train = pd.read_csv('',encoding='utf-8-sig')
 
 columns = ['P_amplitude_mean','P_amplitude_median','P_amplitude_std','P_amplitude_min','P_amplitude_max',\
            'P_on_amplitude_mean','P_on_amplitude_median','P_on_amplitude_std','P_on_amplitude_min','P_on_amplitude_max',\
