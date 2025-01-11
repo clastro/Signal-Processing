@@ -18,7 +18,7 @@ abs(Zxx[:,3*freq_range:4*freq_range]).mean()
 abs(Zxx[:,4*freq_range:5*freq_range]).mean()
 
 """
-#Visualization
+# Visualization
 plt.pcolormesh(t, f, np.abs(Zxx), vmin=0, vmax=amp, shading='gouraud')
 plt.title('STFT Magnitude')
 plt.ylabel('Frequency [Hz]')
